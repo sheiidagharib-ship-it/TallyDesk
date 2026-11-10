@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tally Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a class guide bar on top, then a desktop app window (sidebar + work area) the teacher can click through.
+   Single light look on purpose: it depicts one product's UI. */
+:root{
+  --ground:#E7ECEB; --window:#FFFFFF; --side:#F4F6F5; --line:#DCE2E0; --ink:#1B2524; --muted:#66716F;
+  --brand:#0F5C5A; --brand-soft:#E3F0EE; --amber:#B86E00; --amber-soft:#FFF1D9; --green:#1E7A43; --green-soft:#E1F3E8;
+  --red:#B3261E; --guide:#1B2524; --guide-fg:#F4F6F5; --hl:#FFD23F;
+  --f:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+html,body{background:var(--ground);color:var(--ink)}
+body{font:15px/1.45 var(--f);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:13px}
+
+/* class guide */
+.guide{max-width:1180px;margin:0 auto 14px;background:var(--guide);color:var(--guide-fg);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.guide .lab{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+.guide .note{font-size:13px;opacity:.85;flex:1 1 220px;min-width:0}
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #3B4746;background:transparent;color:var(--guide-fg);border-radius:999px;padding:5px 11px;font-size:13px;display:flex;gap:6px;align-items:center}
+.chip b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#33403F;font-size:12px}
+.chip[aria-current="step"]{background:var(--hl);color:#1B2524;border-color:var(--hl)}
+.chip[aria-current="step"] b{background:#1B2524;color:var(--hl)}
+.gbtn{background:#33403F;border:0;color:var(--guide-fg);border-radius:8px;padding:6px 11px;font-size:13px}
+
+/* window */
+.scroller{max-width:1180px;margin:0 auto;overflow-x:auto;border-radius:14px}
+.win{min-width:980px;background:var(--window);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 18px 40px -24px rgba(15,40,38,.45)}
+.titlebar{height:38px;background:var(--side);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13px;color:var(--muted)}
+.dots{display:flex;gap:7px;margin-right:10px}.dots i{width:12px;height:12px;border-radius:50%;background:#D5DBD9}
+.app{display:grid;grid-template-columns:210px 1fr;min-height:640px}
+.side{background:var(--side);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;padding:4px 8px 16px}
+.logo span{width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:15px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;color:var(--muted);border:0;background:none;text-align:left;width:100%}
+.nav.on{background:var(--window);color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.nav small{font-size:11px;opacity:.7}
+.me{margin-top:auto;display:flex;gap:9px;align-items:center;padding:10px 8px;border-top:1px solid var(--line);font-size:13px}
+.av{width:30px;height:30px;border-radius:50%;background:#C9D9D6;display:grid;place-items:center;font-weight:700;color:var(--brand)}
+.main{padding:24px 28px;min-width:0}
+.head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--window);border-radius:8px;padding:8px 14px;font-weight:600}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.p-draft{background:#EDEFEE;color:var(--muted)}.p-sent{background:var(--brand-soft);color:var(--brand)}
+.p-over{background:var(--amber-soft);color:var(--amber)}.p-paid{background:var(--green-soft);color:var(--green)}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid var(--line)}
+tr.row{cursor:pointer}tr.row:hover td{background:#F8FAF9}
+.r{text-align:right}
+.tabs{display:flex;gap:4px;margin-bottom:12px}
+.tabs span{padding:5px 12px;border-radius:999px;font-size:13px;color:var(--muted);border:1px solid var(--line)}
+.tabs span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* wizard */
+.wz{display:flex;gap:0;margin-bottom:22px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.wz div{flex:1;padding:9px 12px;font-size:13px;color:var(--muted);border-right:1px solid var(--line);background:var(--side)}
+.wz div:last-child{border-right:0}
+.wz div.on{background:var(--window);color:var(--ink);font-weight:600;box-shadow:inset 0 -3px 0 var(--brand)}
+.wz div.done{color:var(--brand)}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;max-width:720px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--window);font-weight:400;min-width:0}
+textarea{min-height:150px;resize:vertical}
+.hint{font-size:12px;color:var(--muted);font-weight:400}
+.foot{display:flex;justify-content:space-between;margin-top:26px;max-width:880px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:820px}
+.cl{border:1px solid var(--line);border-radius:10px;padding:14px;text-align:left;background:var(--window)}
+.cl.sel{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+.cl b{display:block}.cl span{font-size:13px;color:var(--muted)}
+.items td{padding:7px 6px}.items input{width:100%}
+.items td.x button{border:0;background:none;color:var(--muted);font-size:18px}
+.tot{margin-left:auto;width:320px;display:grid;grid-template-columns:1fr auto;gap:8px 16px;font-size:14px;margin-top:14px}
+.tot .big{font-size:18px;font-weight:700;border-top:1px solid var(--line);padding-top:8px}
+.prev{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px}
+.paper{border:1px solid var(--line);border-radius:6px;padding:26px;background:#fff;box-shadow:0 8px 20px -16px rgba(0,0,0,.4);font-size:13px}
+.paper h2{margin:0 0 2px;font-size:20px}
+.paper table td,.paper table th{padding:6px 4px}
+.mail{display:flex;flex-direction:column;gap:12px}
+.detail{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px}
+.box{border:1px solid var(--line);border-radius:10px;padding:16px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}.kv dt{color:var(--muted)}.kv dd{margin:0}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tl li{display:grid;grid-template-columns:12px 1fr;gap:10px;font-size:14px}
+.tl li i{width:10px;height:10px;border-radius:50%;background:var(--brand);margin-top:5px}
+.tl li.w i{background:var(--amber)}
+.tl small{display:block;color:var(--muted)}
+.lock{display:flex;gap:10px;background:#F4F6F5;border:1px dashed #B9C3C1;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--muted);margin-top:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(20,30,29,.45);display:grid;place-items:center;padding:16px}
+.dlg{background:var(--window);border-radius:14px;padding:22px;width:min(560px,100%);display:flex;flex-direction:column;gap:12px}
+.dlg h3{margin:0;font-size:18px}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .2s ease-out}@keyframes up{from{opacity:0;translate:0 8px}}}
+
+/* brief panel */
+.brief{max-width:1180px;margin:0 auto 14px;background:var(--window);border:1px solid var(--line);border-radius:14px;padding:0}
+.brief summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none}
+.brief summary::-webkit-details-marker{display:none}
+.brief .bb{padding:4px 22px 18px;direction:rtl;text-align:right;font-size:15px;line-height:1.8;max-height:70vh;overflow:auto}
+.brief .bb p{margin:.6em 0}
+.bt{width:100%;border-collapse:collapse;margin:10px 0}
+.bt th,.bt td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--line);text-transform:none;letter-spacing:0;font-size:14px}
+</style>
+</head><body>
+
+<details class="brief" open><summary>Project brief — Tally Desk (Persian, read first)</summary><div class="bb" dir="rtl" lang="fa">
+<p><b>شرکت و اپ:</b> تالی دسک یه شرکت نرم‌افزاری کوچیکه. اپ desktopش برای فریلنسرها (طراح، مترجم، برنامه‌نویس) و شرکت‌های کوچیک تا ده نفره که فاکتور می‌سازن، برای مشتری‌هاشون می‌فرستن و پیگیری می‌کنن پول برسه. اپ از اول فقط روی کامپیوتر ساخته شده و کاربرها اغلب موقع کار روی پروژه‌ی خودشون از اون استفاده می‌کنن.</p>
+<p><b>چرا الان:</b> تیم پشتیبانی شرکت می‌گه چند جور شکایت می‌رسه: بعضی‌ها می‌گن ساخت فاکتور طولانیه، بعضی‌ها می‌گن بعد از ارسال فهمیدن یه جاش اشتباهه، و بعضی‌ها می‌گن پیگیری پول سخته. شرکت نمی‌دونه این‌ها یه مشکلن یا چند مشکل جدا، و نمی‌دونه کدوم مهم‌تره. برای همین می‌خواد قبل از هر طراحی، مشکل رو درست بفهمه.</p>
+<p><b>محدوده‌ی کار ما:</b> فقط فلو ساخت و ارسال فاکتور تا گرفتن پول. بقیه‌ی اپ (گزارش‌ها، تنظیمات، مشتری‌ها به‌عنوان لیست) تو این پروژه نیست.</p>
+<p><b>سناریو (یه نمونه‌ی خیالی، شواهد نیست):</b> مینا یه طراحی فریلنسره که تالی دسک رو برای فاکتور استفاده می‌کنه. آخر ماه یه پروژه رو تموم کرده و می‌خواد فاکتور بفرسته. فاکتور رو می‌سازه، اقلام رو وارد می‌کنه و ایمیل رو می‌فرسته. چند ساعت بعد می‌فهمه یه قلم رو جا انداخته. نمی‌دونه فاکتور ارسال‌شده رو چطوری درست کنه و چند روز بعد هم باید دستی به مشتری یادآوری بفرسته. این فقط یه تصویر برای فکر کردنه؛ نمی‌دونیم کاربرهای واقعی همین‌جوری کار می‌کنن یا نه.</p>
+<p><b>فلو فعلی (طبق گفته‌ی شرکت):</b> مرحله‌ی ۱ ساخت فاکتور جدید ← مرحله‌ی ۲ انتخاب یا ساخت مشتری ← مرحله‌ی ۳ افزودن اقلام و قیمت ← مرحله‌ی ۴ مالیات و تخفیف ← مرحله‌ی ۵ پیش‌نمایش و ارسال ایمیلی ← مرحله‌ی ۶ پیگیری وضعیت پرداخت و یادآوری.</p>
+<table class="bt"><thead><tr><th>شماره</th><th>چیزی که می‌دونیم</th><th>منبع</th></tr></thead><tbody><tr><td>دانسته‌ی ۱</td><td>اپ فقط روی desktop کار می‌کنه.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۲</td><td>کاربرها بیشتر فریلنسر یا شرکت‌های تا ده نفرن.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۳</td><td>ساخت فاکتور شش مرحله داره (مرحله‌ی ۱ تا ۶).</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۴</td><td>بعضی فاکتورها دیر پرداخت می‌شن.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۵</td><td>یادآوری پرداخت الان دستی انجام می‌شه.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۶</td><td>مشتری‌ها فاکتور رو با ایمیل می‌گیرن.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۷</td><td>بعضی کاربرها فاکتور رو ارسال می‌کنن و بعد اشتباهش رو می‌فهمن.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۸</td><td>داده‌ی قابل‌اعتمادی درباره‌ی دلیل دیر پرداخت شدن نیست.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۹</td><td>شرکت اسم یه ابزار فاکتورسازی دیگه رو فقط به‌عنوان مثال برده، نه نیاز.</td><td>شرکت</td></tr><tr><td>دانسته‌ی ۱۰</td><td>شرکت هنوز نمی‌دونه بزرگ‌ترین مشکل کجاست.</td><td>شرکت</td></tr></tbody></table>
+<table class="bt"><thead><tr><th>شماره</th><th>سؤال پژوهش</th><th>از کجا</th></tr></thead><tbody><tr><td>سؤال پژوهش ۱</td><td>کاربرها تو کدوم مرحله از مرحله‌ی ۱ تا ۵ گیر می‌کنن یا اشتباه می‌کنن؟</td><td>دانسته‌ی ۳، دانسته‌ی ۷</td></tr><tr><td>سؤال پژوهش ۲</td><td>چرا فاکتورها دیر پرداخت می‌شن، از دید فرستنده و از دید گیرنده؟</td><td>دانسته‌ی ۴، دانسته‌ی ۸</td></tr><tr><td>سؤال پژوهش ۳</td><td>یادآوری دستی چقدر از وقت کاربر رو می‌گیره و چطوری انجامش می‌دن؟</td><td>دانسته‌ی ۵</td></tr><tr><td>سؤال پژوهش ۴</td><td>کاربرها بعد از ارسال، اشتباه رو چطوری می‌فهمن و چطوری درستش می‌کنن؟</td><td>دانسته‌ی ۷</td></tr><tr><td>سؤال پژوهش ۵</td><td>ابزارهای فاکتورسازی موجود، از اونی که شرکت اسم برده شروع کنیم، فلو ساخت تا پیگیری رو چطوری انجام می‌دن؟</td><td>دانسته‌ی ۹</td></tr><tr><td>سؤال پژوهش ۶</td><td>پژوهش‌های منتشرشده درباره‌ی دیر پرداخت شدن فاکتورها و اثر یادآوری چی می‌گن؟</td><td>دانسته‌ی ۴، دانسته‌ی ۵</td></tr></tbody></table>
+</div></details>
+
+<div class="guide" role="region" aria-label="Class guide">
+  <div class="lab">Class demo · made-up app</div>
+  <div class="steps" id="chips"></div>
+  <div class="note" id="gnote"></div>
+  <button class="gbtn" id="later" hidden>Jump 20 days ahead</button>
+  <button class="gbtn" id="reset">Start over</button>
+</div>
+
+<div class="scroller">
+<div class="win">
+  <div class="titlebar"><div class="dots"><i></i><i></i><i></i></div>Tally Desk</div>
+  <div class="app">
+    <aside class="side">
+      <div class="logo"><span>T</span>Tally Desk</div>
+      <button class="nav on" id="navInv">Invoices</button>
+      <button class="nav" disabled>Clients <small>not in this project</small></button>
+      <button class="nav" disabled>Reports <small>not in this project</small></button>
+      <button class="nav" disabled>Settings <small>not in this project</small></button>
+      <div class="me"><div class="av">M</div><div><b>Mina</b><div class="sub">Freelance designer</div></div></div>
+    </aside>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+</div>
+<div id="layer"></div>
+
+<script>
+const TODAY = new Date(2026,9,30);
+const fmtD = d => d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const addDays = (d,n) => new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const eur = n => '€' + n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const CLIENTS = [
+  {name:'Studio Lumen',contact:'Sara Okafor',email:'accounts@studiolumen.example'},
+  {name:'Northwind Books',contact:'Tom Reyes',email:'tom@northwindbooks.example'},
+  {name:'Kite & Co',contact:'Lea Brandt',email:'billing@kiteco.example'}
+];
+const OLD = [
+  {no:'INV-0042',client:'Northwind Books',issued:'2 Oct 2026',due:'16 Oct 2026',total:840,status:'over'},
+  {no:'INV-0041',client:'Studio Lumen',issued:'18 Sep 2026',due:'2 Oct 2026',total:1450,status:'paid'},
+  {no:'INV-0040',client:'Kite & Co',issued:'4 Sep 2026',due:'18 Sep 2026',total:310,status:'paid'},
+  {no:'INV-0039',client:'Studio Lumen',issued:'21 Aug 2026',due:'4 Sep 2026',total:2050,status:'paid'}
+];
+const STEPS = ['New invoice','Pick or add a client','Items and prices','Tax and discount','Preview and email','Track payment, remind'];
+const NOTES = [
+  'Open the invoice list, then press "New invoice". Fill the number and dates.',
+  'Pick a client from the list, or add a new one.',
+  'Add each line: what you did, how many, the price.',
+  'Set the tax rate and any discount. The total updates.',
+  'Check the invoice, write the email, press Send.',
+  'After sending, follow the payment. Reminders are sent by hand.'
+];
+const LABEL = {draft:'Draft',sent:'Sent',over:'Overdue',paid:'Paid'};
+const PCLS = {draft:'p-draft',sent:'p-sent',over:'p-over',paid:'p-paid'};
+
+let S;
+function fresh(){
+  S = {view:'list',step:0,
+    inv:{no:'INV-0043',issued:'2026-10-30',terms:'14',ref:'',client:null,
+      items:[{d:'Brand identity design',q:1,p:1200}],tax:20,disc:0,
+      to:'',subject:'',msg:'',status:'draft',sentOn:null,daysLater:0,log:[]}};
+}
+fresh();
+
+function totals(){
+  const sub = S.inv.items.reduce((a,i)=>a+(+i.q||0)*(+i.p||0),0);
+  const disc = Math.min(sub,+S.inv.disc||0);
+  const tax = (sub-disc)*(+S.inv.tax||0)/100;
+  return {sub,disc,tax,total:sub-disc+tax};
+}
+function dueDate(){return addDays(new Date(S.inv.issued),+S.inv.terms||0)}
+function client(){return CLIENTS.find(c=>c.name===S.inv.client)}
+
+function chips(){
+  const cur = S.view==='list'?0:S.step;
+  document.getElementById('chips').innerHTML = STEPS.map((s,i)=>
+    `<button class="chip" data-go="${i}" ${cur===i?'aria-current="step"':''}><b>${i+1}</b>${s}</button>`).join('');
+  document.getElementById('gnote').textContent = NOTES[cur];
+  document.getElementById('later').hidden = !(S.step===5 && S.view==='detail' && S.inv.daysLater===0);
+}
+
+function wz(){
+  return `<div class="wz">${['Details','Client','Items','Tax and discount','Preview and send'].map((s,i)=>
+    `<div class="${i===S.step?'on':i<S.step?'done':''}">${i+1}. ${s}</div>`).join('')}</div>`;
+}
+
+function render(){
+  const m = document.getElementById('main');
+  const v = S.view;
+  if(v==='list'){
+    const rows = [];
+    if(S.inv.status!=='draft' || S.step>0) rows.push({no:S.inv.no,client:S.inv.client||'No client yet',issued:fmtD(new Date(S.inv.issued)),due:fmtD(dueDate()),total:totals().total,status:S.inv.status,mine:1});
+    m.innerHTML = `<div class="head"><div><h1>Invoices</h1><div class="sub">All invoices you created</div></div>
+      <button class="btn pri" id="new">+ New invoice</button></div>
+      <div class="tabs"><span class="on">All</span><span>Draft</span><span>Sent</span><span>Overdue</span><span>Paid</span></div>
+      <table><thead><tr><th>Number</th><th>Client</th><th>Issued</th><th>Due</th><th>Status</th><th class="r">Total</th></tr></thead><tbody>
+      ${[...rows,...OLD].map(r=>`<tr class="row" data-open="${r.mine?'mine':r.no}"><td class="mono">${r.no}</td><td>${esc(r.client)}</td><td>${r.issued}</td><td>${r.due}</td><td><span class="pill ${PCLS[r.status]}">${LABEL[r.status]}</span></td><td class="r num">${eur(r.total)}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  else if(v==='wizard'){
+    const I = S.inv, t = totals();
+    let body='';
+    if(S.step===0) body = `<div class="form">
+      <label for="f-no">Invoice number<input id="f-no" class="mono" value="${I.no}" readonly><span class="hint">Set by the app</span></label>
+      <label for="f-ref">Your reference<input id="f-ref" data-k="ref" value="${esc(I.ref)}" placeholder="e.g. Project name"></label>
+      <label for="f-iss">Issue date<input id="f-iss" type="date" data-k="issued" value="${I.issued}"></label>
+      <label for="f-terms">Payment terms<select id="f-terms" data-k="terms">${['7','14','30'].map(x=>`<option value="${x}" ${I.terms===x?'selected':''}>${x} days</option>`).join('')}</select><span class="hint">Due ${fmtD(dueDate())}</span></label></div>`;
+    if(S.step===1) body = `<p class="sub" style="margin-top:0">Who is this invoice for?</p><div class="cards">${CLIENTS.map(c=>
+      `<button class="cl ${I.client===c.name?'sel':''}" data-client="${esc(c.name)}"><b>${esc(c.name)}</b><span>${esc(c.contact)}</span><br><span class="mono">${esc(c.email)}</span></button>`).join('')}
+      <button class="cl" id="addc"><b>+ Add a new client</b><span>Name, contact, email, address</span></button></div>`;
+    if(S.step===2) body = `<table class="items" style="max-width:880px"><thead><tr><th style="width:55%">Description</th><th>Qty</th><th>Price</th><th class="r">Amount</th><th></th></tr></thead><tbody>
+      ${I.items.map((it,i)=>`<tr><td><input id="d${i}" data-i="${i}" data-f="d" value="${esc(it.d)}" placeholder="What you did" aria-label="Description"></td>
+        <td><input id="q${i}" data-i="${i}" data-f="q" type="number" min="0" value="${it.q}" aria-label="Quantity" style="width:70px"></td>
+        <td><input id="p${i}" data-i="${i}" data-f="p" type="number" min="0" value="${it.p}" aria-label="Price" style="width:110px"></td>
+        <td class="r num">${eur((+it.q||0)*(+it.p||0))}</td><td class="x"><button data-del="${i}" aria-label="Remove line">×</button></td></tr>`).join('')}
+      </tbody></table><button class="btn" id="addi" style="margin-top:12px">+ Add line</button>
+      <div class="tot" style="margin-right:auto;margin-left:0;max-width:880px;width:auto;grid-template-columns:auto auto;justify-content:end"><span>Subtotal</span><b class="num">${eur(t.sub)}</b></div>`;
+    if(S.step===3) body = `<div class="form" style="max-width:520px">
+      <label for="f-tax">Tax rate (%)<input id="f-tax" type="number" min="0" data-k="tax" value="${I.tax}"></label>
+      <label for="f-disc">Discount (€)<input id="f-disc" type="number" min="0" data-k="disc" value="${I.disc}"></label></div>
+      <div class="tot" style="margin-left:0"><span>Subtotal</span><span class="num r">${eur(t.sub)}</span><span>Discount</span><span class="num r">− ${eur(t.disc)}</span><span>Tax ${I.tax}%</span><span class="num r">${eur(t.tax)}</span><span class="big">Total</span><span class="big num r">${eur(t.total)}</span></div>`;
+    if(S.step===4){
+      const c = client()||{};
+      if(!I.to) I.to = c.email||'';
+      if(!I.subject) I.subject = `Invoice ${I.no} from Mina`;
+      if(!I.msg) I.msg = `Hi ${c.contact?c.contact.split(' ')[0]:'there'},\n\nPlease find invoice ${I.no} attached.\n\nThanks,\nMina`;
+      body = `<div class="prev"><div class="paper">${paper()}</div>
+      <div class="mail"><label for="m-to">To<input id="m-to" data-k="to" value="${esc(I.to)}"></label>
+      <label for="m-sub">Subject<input id="m-sub" data-k="subject" value="${esc(I.subject)}"></label>
+      <label for="m-msg">Message<textarea id="m-msg" data-k="msg">${esc(I.msg)}</textarea></label>
+      <div class="sub">The invoice is attached as a PDF.</div></div></div>`;
+    }
+    const can = S.step!==1 || I.client;
+    m.innerHTML = `<div class="head"><div><h1>New invoice</h1><div class="sub mono">${I.no}</div></div><button class="btn" id="cancel">Save as draft</button></div>
+      ${wz()}${body}
+      <div class="foot"><button class="btn" id="back" ${S.step===0?'disabled':''}>Back</button>
+      <button class="btn pri" id="next" ${can?'':'disabled'}>${S.step===4?'Send invoice':'Next'}</button></div>`;
+  }
+  else if(v==='detail'){
+    const I = S.inv, t = totals(), c = client()||{};
+    const now = addDays(TODAY,I.daysLater);
+    const over = I.status!=='paid' && now>dueDate();
+    if(over && I.status==='sent') I.status='over';
+    m.innerHTML = `<div class="head"><div><h1 style="display:flex;gap:10px;align-items:center"><span class="mono" style="font-size:20px">${I.no}</span><span class="pill ${PCLS[I.status]}">${LABEL[I.status]}</span></h1>
+      <div class="sub">${esc(I.client)} · today is ${fmtD(now)}</div></div>
+      <div class="actions"><button class="btn" id="edit" disabled>Edit</button><button class="btn" id="remind" ${I.status==='paid'?'disabled':''}>Send reminder</button><button class="btn pri" id="paid" ${I.status==='paid'?'disabled':''}>Mark as paid</button></div></div>
+      <div class="detail"><div><div class="paper">${paper()}</div>
+      <div class="lock"><span aria-hidden="true">🔒</span><span>A sent invoice can't be changed. To fix it, void it and create a new invoice.</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><dl class="kv"><dt>Total</dt><dd class="num"><b>${eur(t.total)}</b></dd><dt>Due</dt><dd>${fmtD(dueDate())}</dd><dt>Sent to</dt><dd class="mono">${esc(I.to)}</dd><dt>Reminders</dt><dd>${I.log.filter(l=>l.r).length||'None yet'} · sent by hand</dd></dl></div>
+        <div class="box"><b style="display:block;margin-bottom:10px">Activity</b><ul class="tl">${[...I.log].reverse().map(l=>`<li class="${l.w?'w':''}"><i></i><div>${esc(l.t)}<small>${l.d}</small></div></li>`).join('')}</ul></div>
+      </div></div>`;
+    if(over && !I.log.some(l=>l.w)) { I.log.push({t:'Payment is late. No reminder sent yet.',d:fmtD(addDays(dueDate(),1)),w:1}); return render(); }
+  }
+  else if(v==='old'){
+    const r = OLD.find(o=>o.no===S.old);
+    m.innerHTML = `<div class="head"><div><h1 style="display:flex;gap:10px;align-items:center"><span class="mono" style="font-size:20px">${r.no}</span><span class="pill ${PCLS[r.status]}">${LABEL[r.status]}</span></h1><div class="sub">${r.client}</div></div><button class="btn" id="toList">Back to invoices</button></div>
+      <div class="box" style="max-width:520px"><dl class="kv"><dt>Total</dt><dd class="num">${eur(r.total)}</dd><dt>Issued</dt><dd>${r.issued}</dd><dt>Due</dt><dd>${r.due}</dd></dl></div>
+      <p class="sub">Example invoice. Create a new one to walk the six steps.</p>`;
+  }
+  chips();
+}
+
+function paper(){
+  const I=S.inv,t=totals(),c=client()||{};
+  return `<div style="display:flex;justify-content:space-between;gap:12px"><div><h2>Invoice</h2><div class="mono">${I.no}</div></div><div style="text-align:right"><b>Mina Design</b><br><span class="sub">mina@minadesign.example</span></div></div>
+  <div style="display:flex;justify-content:space-between;margin:18px 0;gap:12px"><div><span class="sub">Bill to</span><br><b>${esc(c.name||'—')}</b><br>${esc(c.contact||'')}</div><div style="text-align:right"><span class="sub">Issued</span> ${fmtD(new Date(I.issued))}<br><span class="sub">Due</span> ${fmtD(dueDate())}</div></div>
+  <table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Amount</th></tr></thead><tbody>
+  ${I.items.map(i=>`<tr><td>${esc(i.d||'—')}</td><td class="r num">${i.q}</td><td class="r num">${eur(+i.p||0)}</td><td class="r num">${eur((+i.q||0)*(+i.p||0))}</td></tr>`).join('')}</tbody></table>
+  <div class="tot" style="width:240px"><span>Subtotal</span><span class="r num">${eur(t.sub)}</span>${t.disc?`<span>Discount</span><span class="r num">− ${eur(t.disc)}</span>`:''}<span>Tax ${I.tax}%</span><span class="r num">${eur(t.tax)}</span><span class="big">Total</span><span class="big r num">${eur(t.total)}</span></div>`;
+}
+
+function toast(t){const L=document.getElementById('layer');L.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`;setTimeout(()=>{if(L.firstChild&&L.firstChild.className==='toast')L.innerHTML=''},2600)}
+
+function send(){
+  const I=S.inv;I.status='sent';I.sentOn=TODAY;
+  I.log=[{t:'Invoice created',d:fmtD(TODAY)},{t:`Emailed to ${I.to}`,d:fmtD(TODAY)}];
+  S.view='detail';S.step=5;render();toast('Invoice sent');
+}
+
+function goStep(n){
+  if(n===0){S.view='list';S.step=0;return render()}
+  if(n>=1 && !S.inv.client) S.inv.client='Studio Lumen';
+  if(n===5){ if(S.inv.status==='draft'){S.step=4;render();return send()} S.view='detail';S.step=5;return render(); }
+  if(S.inv.status!=='draft'){fresh();S.inv.client='Studio Lumen'}
+  S.view='wizard';S.step=n-1;render();
+}
+
+function reminder(){
+  const I=S.inv,c=client()||{};
+  document.getElementById('layer').innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="rt"><div class="dlg">
+    <h3 id="rt">Send a reminder</h3><div class="sub">Write the reminder yourself. The app does not send reminders on its own.</div>
+    <label for="r-to">To<input id="r-to" value="${esc(I.to)}"></label>
+    <label for="r-sub">Subject<input id="r-sub" value="" placeholder="Subject"></label>
+    <label for="r-msg">Message<textarea id="r-msg" placeholder="Write your message"></textarea></label>
+    <div class="actions" style="justify-content:flex-end"><button class="btn" id="rc">Cancel</button><button class="btn pri" id="rs">Send reminder</button></div></div></div>`;
+  document.getElementById('r-sub').focus();
+}
+
+document.addEventListener('click',e=>{
+  const el = e.target.closest('button,tr.row'); if(!el) return;
+  const I = S.inv;
+  if(el.dataset.go!==undefined) return goStep(+el.dataset.go);
+  if(el.id==='reset'){fresh();render();return toast('Started over')}
+  if(el.id==='navInv'||el.id==='toList'){S.view='list';return render()}
+  if(el.id==='new'){if(I.status!=='draft')fresh();S.view='wizard';S.step=0;return render()}
+  if(el.dataset.open){ if(el.dataset.open==='mine'){ if(I.status==='draft'){S.view='wizard';} else {S.view='detail';S.step=5} } else {S.view='old';S.old=el.dataset.open} return render() }
+  if(el.id==='cancel'){S.view='list';render();return toast('Saved as draft')}
+  if(el.id==='back'){S.step--;return render()}
+  if(el.id==='next'){ if(S.step===4) return send(); S.step++; return render() }
+  if(el.dataset.client){I.client=el.dataset.client;I.to='';I.msg='';return render()}
+  if(el.id==='addc') return toast('Adding a client opens a long form. Pick one for this demo.');
+  if(el.id==='addi'){I.items.push({d:'',q:1,p:0});render();return document.getElementById('d'+(I.items.length-1)).focus()}
+  if(el.dataset.del!==undefined){I.items.splice(+el.dataset.del,1);if(!I.items.length)I.items.push({d:'',q:1,p:0});return render()}
+  if(el.id==='later'){I.daysLater=20;render();return toast('20 days later')}
+  if(el.id==='remind') return reminder();
+  if(el.id==='rc'){document.getElementById('layer').innerHTML='';return}
+  if(el.id==='rs'){const d=fmtD(addDays(TODAY,I.daysLater));I.log.push({t:'Reminder sent by hand',d,r:1});document.getElementById('layer').innerHTML='';render();return toast('Reminder sent')}
+  if(el.id==='paid'){I.status='paid';I.log.push({t:'Marked as paid',d:fmtD(addDays(TODAY,I.daysLater))});render();return toast('Marked as paid')}
+});
+document.addEventListener('input',e=>{
+  const t=e.target, I=S.inv;
+  if(t.dataset.k){I[t.dataset.k]=t.value; if(['issued','terms','tax','disc'].includes(t.dataset.k)){const id=t.id,pos=t.selectionStart;render();const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}}
+  if(t.dataset.f){I.items[+t.dataset.i][t.dataset.f]=t.value; if(t.dataset.f!=='d'){const id=t.id;render();const n=document.getElementById(id);n.focus()} }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('layer').innerHTML=''});
+render();
+</script>
+</body></html>
