@@ -26,11 +26,14 @@ function loadState() {
   }
 }
 
-const review = new URLSearchParams(window.location.search).get('review') === '1'
+// Review bar: add ?review=1 to the address (or #review where a query string can't be used)
+const review = new URLSearchParams(window.location.search).get('review') === '1' || window.location.hash === '#review'
 
 export default function App() {
   const [state, setState] = useState(loadState)
-  useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(state)), [state])
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) } catch { /* browser storage not available */ }
+  }, [state])
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
   const go = (screen, extra = {}) => {
