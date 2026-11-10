@@ -11,6 +11,8 @@ Tally Desk is a desktop invoicing app for freelancers and small companies of up 
 | wireframes/ | Flows v1.0, Wireframes v1.0 and the wireframe screens exported as HTML |
 | app/ | Empty. The prototype code goes here later |
 
+CLAUDE.md in this folder holds the project instructions that every Claude Code chat reads first.
+
 ## Two kinds of files
 Files from two tools are kept apart by their names:
 - **Claude (chat) files:** `Approved — Name vN.md` (and `Instructions — Template v1.md`, `Tally Desk Demo App v1.html`). Version is in the file name. These are never changed here.

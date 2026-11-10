@@ -8,7 +8,7 @@ Version: v1.0 · Date: 2026-11-10 · Time: 17:21 · Created by: Sheida · Made w
 | Folders | project/, research/, wireframes/, app/ (empty) |
 | Research-phase state | project/Approved — state v1.4 (history of the research phase; not changed) |
 | Wireframe screens | 5 of 10 as HTML in wireframes/ (S1, S3, S6, S7, S9). Missing: S2, S4, S5, S8, S10 |
-| Next step | Install Node.js on Windows, then build the prototype (Session 5, section 4) |
+| Next step | Sheida sends wireframes S2, S4, S5, S8, S10; then build the prototype (Session 5, section 4) |
 
 ## Decisions
 | Date | Decision | Reason |
@@ -20,6 +20,7 @@ Version: v1.0 · Date: 2026-11-10 · Time: 17:21 · Created by: Sheida · Made w
 | 2026-11-10 | Wireframe HTML files keep their original names (S1-New-invoice.html …); the upload prefix (e.g. 061f79d9-) was dropped | The screens link to each other by these names |
 | 2026-11-10 | Prototype tools: Vite + React, started with one command (npm run dev) | Most common simple option for a clickable desktop web prototype |
 | 2026-11-10 | Operating system: Windows | Sheida |
+| 2026-11-10 | Project instructions live in CLAUDE.md (handout 1-b, Tally Desk details) | The cloud session has no project Instructions box; CLAUDE.md is read at the start of every chat |
 
 ## Open questions
 | Question | Why it is open |
@@ -33,3 +34,4 @@ Version: v1.0 · Date: 2026-11-10 · Time: 17:21 · Created by: Sheida · Made w
 | Date | What changed |
 |---|---|
 | 2026-11-10 | Folder set up: files placed in project/, research/, wireframes/; empty app/; README.md and state.md added to each folder and the main folder |
+| 2026-11-10 | CLAUDE.md added with the project instructions; README.md and Status updated |
