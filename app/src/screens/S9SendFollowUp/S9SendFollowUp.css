@@ -1,0 +1,4 @@
+.s9-cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.s9-outcomes { display: flex; flex-direction: column; gap: 10px; }
+.s9-outcomes > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; flex-wrap: wrap; }
+.s9-muted { color: var(--muted); }

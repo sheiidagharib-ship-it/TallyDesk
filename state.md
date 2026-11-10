@@ -4,11 +4,11 @@ Version: v1.0 · Date: 2026-11-10 · Time: 17:21 · Created by: Sheida · Made w
 ## Status
 | Item | Value |
 |---|---|
-| Current phase | Folder setup done. Prototype not started |
+| Current phase | Prototype built for S1, S3, S6, S7, S9 (see app/state.md) |
 | Folders | project/, research/, wireframes/, app/ (empty) |
 | Research-phase state | project/Approved — state v1.4 (history of the research phase; not changed) |
 | Wireframe screens | 5 of 10 as HTML in wireframes/ (S1, S3, S6, S7, S9). Missing: S2, S4, S5, S8, S10 |
-| Next step | Sheida sends wireframes S2, S4, S5, S8, S10; then build the prototype (Session 5, section 4) |
+| Next step | Sheida checks the screens; picks which unplanned cases to build; sends S2, S4, S5, S8, S10 later |
 
 ## Decisions
 | Date | Decision | Reason |
@@ -35,3 +35,4 @@ Version: v1.0 · Date: 2026-11-10 · Time: 17:21 · Created by: Sheida · Made w
 |---|---|
 | 2026-11-10 | Folder set up: files placed in project/, research/, wireframes/; empty app/; README.md and state.md added to each folder and the main folder |
 | 2026-11-10 | CLAUDE.md added with the project instructions; README.md and Status updated |
+| 2026-11-10 | Prototype built in app/ for 5 screens |

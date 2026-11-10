@@ -1,0 +1,9 @@
+.s6-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; align-items: start; }
+.s6-stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.s6-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.s6-history li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.s6-history li:last-child { border-bottom: 0; }
+.s6-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--field-line); margin-top: 5px; }
+.s6-dot.now { background: var(--brand); }
+.s6-muted { font-size: 13px; color: var(--muted); }
+.s6-added { background: var(--brand-soft); }

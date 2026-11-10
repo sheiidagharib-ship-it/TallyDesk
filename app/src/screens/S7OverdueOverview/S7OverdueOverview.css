@@ -1,0 +1,21 @@
+.s7-stack { display: flex; flex-direction: column; gap: 20px; }
+.s7-counts { display: flex; gap: 12px; flex-wrap: wrap; }
+.s7-count { flex: 1 1 180px; border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 2px; }
+.s7-count span { font-size: 13px; color: var(--muted); }
+.s7-count b { font-size: 24px; }
+.s7-action { padding-top: 8px; padding-bottom: 8px; }
+.s7-next { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+.s7-muted { font-size: 14px; color: var(--muted); }
+.s7-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 60px 20px; }
+.s7-empty h2 { font-size: 20px; }
+.s7-empty p { margin: 0; color: var(--muted); max-width: 460px; }
+.s7-empty-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--brand-soft); display: flex; align-items: center; justify-content: center; }
+.s7-loading { display: flex; flex-direction: column; gap: 18px; padding: 8px 0; }
+.s7-ph-card { flex: 1 1 180px; height: 84px; border-radius: 10px; background: #EEF2F1; }
+.s7-ph-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; gap: 20px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.s7-ph-row div { height: 14px; border-radius: 6px; background: #E6EBEA; }
+.s7-error { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--amber); background: var(--amber-soft); border-radius: 10px; padding: 16px; }
+.s7-error svg { flex: none; }
+.s7-error div { display: flex; flex-direction: column; gap: 4px; }
+.s7-error b { font-size: 16px; }
+.s7-error span { font-size: 14px; }
